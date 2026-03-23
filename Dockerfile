@@ -1,11 +1,13 @@
-FROM python:3.9-slim
+# Usa un server web leggerissimo (Nginx)
+FROM nginx:alpine
 
-WORKDIR /app
+# Copia i file del gioco nella cartella del server
+COPY ./src /usr/share/nginx/html
 
-COPY requirements.txt .
+# Espone la porta 8080 (quella standard di Cloud Run)
+EXPOSE 8080
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Configura Nginx per ascoltare sulla 8080
+RUN sed -i 's/listen       80;/listen       8080;/g' /etc/nginx/conf.d/default.conf
 
-COPY hello.py .
-
-CMD ["python", "hello.py"]
+CMD ["nginx", "-g", "daemon off;"]
